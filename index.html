@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#10303a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>ภารกิจคลังสินค้า 3D — DKSH</title>
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <meta name="description" content="แข่งทำงานคลังสินค้า 3D ได้สูงสุด 4 คนบนเครื่องเดียว ลงสินค้า เก็บเข้าแร็ค และโหลดเข้าตู้ให้ครบก่อนใคร" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="hud"></div>
+      <div id="stage">
+        <canvas id="game" aria-label="คลังสินค้า 3 มิติ"></canvas>
+        <div id="fxl"></div>
+        <div id="timer">7:00</div>
+        <div id="tools">
+          <button class="tool" id="bPause" aria-label="หยุดเกม"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+          <button class="tool" id="bCam" aria-label="สลับกล้อง ซูมตามผู้เล่น/ภาพรวม" title="สลับกล้อง ซูมตามผู้เล่น/ภาพรวม" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M11 8v6M8 11h6"/></svg></button>
+          <button class="tool" id="bPad" aria-label="แสดงจอยบนจอ" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="12" r="5"/><circle cx="8" cy="12" r="1.5" fill="currentColor"/><circle cx="18" cy="12" r="3"/></svg></button>
+          <button class="tool" id="bMute" aria-label="เปิดปิดเสียง" aria-pressed="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button class="tool" id="bFull" aria-label="เต็มจอ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+        </div>
+        <div id="count" hidden></div>
+      </div>
+      <div id="pads"></div>
+
+      <div id="boot" class="overlay">
+        <div class="ticket"><div class="hazard"></div><div class="tk">
+          <img src="./favicon.png" alt="" width="72" height="72" style="align-self:center;border-radius:16px" /><p class="eyebrow" style="text-align:center">กำลังเปิดคลังสินค้า…</p>
+          <h1>ภารกิจ<span>คลังสินค้า</span></h1>
+          <div class="bar"><i id="bootBar"></i></div>
+        </div></div>
+      </div>
+
+      <div id="menu" class="overlay" hidden>
+        <div class="ticket"><div class="hazard"></div><div class="tk">
+          <div>
+            <p class="eyebrow">ใบสั่งงาน · คลังสินค้า D1–D4</p>
+            <h1>ภารกิจ<span>คลังสินค้า</span></h1>
+            <p class="sub">เกมแข่งงานคลังสินค้า 3D · รับเข้า – จัดเก็บ – ส่งออก ใครโหลดสินค้าเข้าตู้ครบก่อนชนะ</p>
+          </div>
+          <div class="steps">
+            <span class="step"><b style="background:#1f6fe0">1</b>ลงสินค้า</span>
+            <span class="step"><b style="background:#ff6a13">2</b>พักขาเข้า</span>
+            <span class="step"><b style="background:#14a54a">3</b>เก็บเข้าแร็ค</span>
+            <span class="step"><b style="background:#8a3bd1">4</b>เตรียมขาออก</span>
+            <span class="step"><b style="background:#e3262b">5</b>โหลดเข้าตู้</span>
+          </div>
+          <div class="grp"><span class="grp-l">จำนวนผู้เล่น</span><div class="chips" data-k="players">
+            <button class="chip" data-v="1"><span class="dots"><i style="background:var(--p1)"></i></span>1 คน</button>
+            <button class="chip" data-v="2"><span class="dots"><i style="background:var(--p1)"></i><i style="background:var(--p2)"></i></span>2 คน</button>
+            <button class="chip" data-v="3"><span class="dots"><i style="background:var(--p1)"></i><i style="background:var(--p2)"></i><i style="background:var(--p3)"></i></span>3 คน</button>
+            <button class="chip" data-v="4"><span class="dots"><i style="background:var(--p1)"></i><i style="background:var(--p2)"></i><i style="background:var(--p3)"></i><i style="background:var(--p4)"></i></span>4 คน</button>
+          </div></div>
+          <div class="grp"><span class="grp-l">พาเลทต่อคน</span><div class="chips" data-k="pallets">
+            <button class="chip" data-v="3">3 พาเลท</button><button class="chip" data-v="5">5 พาเลท</button><button class="chip" data-v="10">10 พาเลท</button>
+          </div></div>
+          <div class="grp"><span class="grp-l">เวลา</span><div class="chips" data-k="minutes">
+            <button class="chip" data-v="5">5 นาที</button><button class="chip" data-v="7">7 นาที</button><button class="chip" data-v="10">10 นาที</button>
+          </div></div>
+          <div class="grp"><span class="grp-l">วิธีบังคับ</span>
+            <p class="joy-status" id="joyStatus"></p>
+            <div class="joins" id="joins"></div>
+            <div class="row"><button class="chip" id="bClearJoy">ล้างการผูกจอย</button></div>
+          </div>
+          <button class="btn" id="bStart">เริ่มภารกิจ!</button>
+          <p class="help"><b>วิธีเล่น</b> ขับไปตามลูกศรสีของตัวเอง ถึงจุดแล้วจะหยิบหรือวางให้เอง (หรือกดปุ่ม “หยิบ/วาง” ช่วย)<br />
+            🖱️ <b>คอมพิวเตอร์</b> คลิกเมาส์ค้างที่แป้นสีของตัวเองใต้จอ แล้วลากไปทางที่จะเดิน ปล่อยเมาส์ = หยุด · คลิกปุ่ม “หยิบ/วาง” ข้างแป้น<br />
+            👆 <b>iPad/มือถือ</b> วางนิ้วที่แป้นสีของตัวเองแล้วลาก<br />
+            🎮 <b>จอยเกม</b> โยกคันโยกเพื่อเดิน กดปุ่มใดก็ได้เพื่อหยิบ/วาง<br />
+            ขับรถชนแร็ค +3 วินาที · พักเกมกดปุ่ม ⏸ มุมขวาบน <span id="padInfo"></span></p>
+        </div></div>
+      </div>
+
+      <div id="paused" class="overlay" hidden><div class="ticket"><div class="hazard"></div><div class="tk">
+        <div><p class="eyebrow">พักเบรกสั้น ๆ</p><h1>พักเกม</h1></div>
+        <div class="row"><button class="btn" id="bResume">เล่นต่อ</button><button class="btn ghost" id="bRestart">เริ่มใหม่</button><button class="btn ghost" id="bQuit">กลับเมนู</button></div>
+      </div></div></div>
+
+      <div id="over" class="overlay" hidden><div class="ticket"><div class="hazard"></div><div class="tk">
+        <div><p class="eyebrow">สรุปผลภารกิจ</p><h1 id="ovTitle">ภารกิจสำเร็จ!</h1></div>
+        <div class="res" id="resList"></div>
+        <div class="row"><button class="btn" id="bAgain">เล่นอีกรอบ</button><button class="btn ghost" id="bMenu">เปลี่ยนการตั้งค่า</button></div>
+      </div></div></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
